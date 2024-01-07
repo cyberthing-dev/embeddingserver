@@ -209,34 +209,32 @@ app.post("/browse", async (req, res) => {
         return;
     }
 
-    const urls: string[] = req.body.urls;
+    const url: string = req.body.url;
     const topic: string = req.body.topic;
     let results: string[] = [];
 
-    for await (const url of urls) {
-        const out = await fetch(url).then(r => {
-            return r.text();
-        }).then(async (response) => {
-            const document = new JSDOM(response).window.document;
-            let paragraphs = [];
-            for (const element of document.querySelectorAll("p")) {
-                if (element.textContent) paragraphs.push(element.textContent);
+    const out = await fetch(url).then(r => {
+        return r.text();
+    }).then(async (response) => {
+        const document = new JSDOM(response).window.document;
+        let paragraphs = [];
+        for (const element of document.querySelectorAll("p")) {
+            if (element.textContent) paragraphs.push(element.textContent);
+        }
+        for (const p of paragraphs) {
+            let encoded = enc.encode(p);
+            let text: string;
+            if (encoded.length > 8190) {
+                text = new TextDecoder().decode(enc.decode(encoded.slice(0, 8190)));
+            } else {
+                text = p;
             }
-            for (const p of paragraphs) {
-                let encoded = enc.encode(p);
-                let text: string;
-                if (encoded.length > 8190) {
-                    text = new TextDecoder().decode(enc.decode(encoded.slice(0, 8190)));
-                } else {
-                    text = p;
-                }
-                embedAPI.add(text);
-            }
+            embedAPI.add(text);
+        }
 
-            return (await embedAPI.query(topic)).items || [];
-        });
-        if (out) results.push(...out);
-    }
+        return (await embedAPI.query(topic)).items || [];
+    });
+    if (out) results.push(...out);
     res.json(results);
 });
 
