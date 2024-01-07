@@ -1,0 +1,17 @@
+
+# misc
+*.env
+.log
+
+# TS/JS
+dist
+node_modules
+package-lock.json
+
+# py
+__pycache__
+/python/data/*
+/.venv/
+
+# openai
+static/.well-known

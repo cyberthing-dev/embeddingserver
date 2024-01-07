@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Guy API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <code style="font-size: 14pt;">
+        <u>/search</u>
+        <div style="padding-left: 2ch;">GET</div>
+        <div style="padding-left: 4ch;">Params</div>
+        <div style="padding-left: 6ch;">q: string</div>
+
+        <div style="padding-left: 4ch;">Response</div>
+        <div style="padding-left: 6ch;">
+            {
+                <div style="padding-left: 2ch;">results: string[3]</div>
+                <div style="padding-left: 2ch;">date: string</div>
+            }
+        </div>
+        <br/>
+        <u>/browse</u>
+        <div style="padding-left: 2ch;">POST</div>
+        <div style="padding-left: 4ch;">Body</div>
+        <div style="padding-left: 6ch;">
+            {
+            <div style="padding-left: 2ch;">topic: string</div>
+            <div style="padding-left: 2ch;">urls: string[:3]</div>
+            }
+        </div>
+        <div style="padding-left: 4ch;">Response</div>
+        <div style="padding-left: 6ch;">{
+                <div style="padding-left: 2ch;">summary: string[:3]</div>
+            }
+        </div>
+    </code>
+</body>
+
+</html>

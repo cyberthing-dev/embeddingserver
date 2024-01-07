@@ -1,0 +1,76 @@
+openapi: 3.1.0
+info:
+  title: Google Search
+  description: Use Google Search to search the web and get page summaries
+  version: 1.0.0
+servers:
+  - url: https://gptsearch.cyberthing.dev
+    description: Search server
+paths:
+  /search:
+    get:
+      operationId: query
+      summary: Perform a custom Google search and return snippets and their urls
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: The search query string
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page number to return
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: An array of search results and the current time
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        snippet:
+                          type: string
+                        link:
+                          type: string
+  /browse:
+    post:
+      x-openai-isConsequential: false
+      operationId: browse
+      summary: Browse articles/pages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                urls:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: An array of summaries for the provided URLs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    summary:
+                      type: string
+                    url:
+                      type: string

@@ -1,0 +1,8 @@
+{
+    "yaml.schemas": {
+        "schemas/openapi.json": "/static/.well-known/ai-plugin.yaml"
+    },
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "off"
+}
