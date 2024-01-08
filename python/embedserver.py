@@ -1,4 +1,4 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import numpy as np
 from numpy.typing import NDArray
 from openai import OpenAI
@@ -37,8 +37,8 @@ class Handler(BaseHTTPRequestHandler):
     page_ids: NDArray[np.uint32]
     embeds: NDArray  # [NDArray[np.float64]]
 
-    def log_message(self, *_, **__) -> None:
-        return
+    #def log_message(self, *_, **__) -> None:
+    #    return
 
     @staticmethod
     def unit_l2_normalization(vector: NDArray[np.float64]):
@@ -102,16 +102,20 @@ class Handler(BaseHTTPRequestHandler):
         ][:3]
 
     def send(self, code: int, data: dict):
+        to_send = json.dumps(data).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", len(to_send))
         self.end_headers()
-        self.wfile.write(json.dumps(data).encode("utf-8"))
+        self.wfile.write(to_send)
 
     def json(self) -> dict:
-        content_len = self.headers.get("Content-Length", 0)
-        if content_len == 0:
-            raise ValueError("No content length")
-        return json.loads(self.rfile.read(int(content_len)))
+        #content_len = self.headers.get("Content-Length", 0)
+        length = int(self.headers.get("Content-Length",0))
+        out = self.rfile.read(length)
+        if length == 0:
+            raise ValueError("No data")
+        return json.loads(out.decode("utf-8"))
 
     def do_POST(self):
         try:
@@ -137,7 +141,9 @@ class Handler(BaseHTTPRequestHandler):
                 self.send(200, {"success": True, "items": 1})
 
             elif self.path == "/query":
-                items = self.query(self.json()["text"])
+                json = self.json()
+                #print(json)
+                items = self.query(json["text"])
                 self.send(200, {"success": True, "items": items})
 
             else:
@@ -154,7 +160,9 @@ def main():
     Handler.text_db = text_db
     Handler.embeds = embeds
     Handler.text_hashes = text_hashes
-    server = HTTPServer(("0.0.0.0", 4211), Handler)
+    Handler.protocol_version = "HTTP/1.1"
+    Handler.timeout = 50
+    server = ThreadingHTTPServer(("0.0.0.0", 4211), Handler)
     try:
         print("Hosted on http://localhost:4211")
         server.serve_forever()

@@ -111,6 +111,7 @@ const googleSearch = async (query: string) => {
 }
 
 class EmbedAPI {
+    //baseURL = "http://localhost:4211";
     baseURL = "http://db:4211";
 
     add = async (text: string, pageID?: string) => {
@@ -126,6 +127,7 @@ class EmbedAPI {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Request-Timeout": "50"
                 },
                 body: JSON.stringify({ text, pageID })
             }
@@ -162,31 +164,9 @@ class EmbedAPI {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Request-Timeout": "50"
                 },
                 body: JSON.stringify({ text })
-            }
-        )).json()
-        return response;
-    }
-
-    /**
-     * used for ranking snippets
-     */
-    contained = async (target: string, matches: string[]) => {
-        const response: {
-            success: true;
-            similar: string[];
-        } | {
-            success: false;
-            error: string;
-        } = await (await fetch(
-            `${this.baseURL}/contained`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ target, matches })
             }
         )).json();
         return response;
@@ -203,7 +183,6 @@ app.post("/browse", async (req, res) => {
      * to some randomly generated key.
      */
     if (req.headers.authorization !== `Bearer ${process.env.CHATGPTSECRET}`) {
-        console.log(req.headers.authorization);
         console.log("Unauthorized request");
         res.status(401).send("Unauthorized");
         return;
@@ -217,11 +196,11 @@ app.post("/browse", async (req, res) => {
         return r.text();
     }).then(async (response) => {
         const document = new JSDOM(response).window.document;
-        let paragraphs = [];
+        let paragraphs: string[] = [];
         for (const element of document.querySelectorAll("p")) {
             if (element.textContent) paragraphs.push(element.textContent);
         }
-        for (const p of paragraphs) {
+        paragraphs.forEach(async (p) => {
             let encoded = enc.encode(p);
             let text: string;
             if (encoded.length > 8190) {
@@ -229,9 +208,8 @@ app.post("/browse", async (req, res) => {
             } else {
                 text = p;
             }
-            embedAPI.add(text);
-        }
-
+            return await embedAPI.add(text);
+        });
         return (await embedAPI.query(topic)).items || [];
     });
     if (out) results.push(...out);
