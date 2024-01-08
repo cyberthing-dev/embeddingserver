@@ -5,6 +5,7 @@ import { marked } from "marked";
 import { TiktokenModel, encoding_for_model } from "tiktoken";
 import { customsearch } from "@googleapis/customsearch";
 import { config } from "dotenv";
+import { readFileSync } from "fs";
 
 const PORT = 8181;
 const custom_search = customsearch({
@@ -257,7 +258,7 @@ renderer.heading = (text, level) => {
 };
 
 app.get("/privacy", async (_, res) => {
-    const md = await marked(await (await fetch("privacy.md")).text(), { renderer });
+    const md = await marked(readFileSync("./static/privacy.md").toString(), { renderer });
     const head = `<head><title>Privacy Policy</title><link rel="stylesheet" href="/style.css"></head>`;
     res.send(`<!DOCTYPE html><html>${head}<body><main>${md}</main><center>© 2023-2024 CyberThing all rights reserved</center></body></html>`);
 });
