@@ -207,7 +207,11 @@ app.post("/browse", async (req, res) => {
         for (const element of document.querySelectorAll("p")) {
             if (element.textContent) paragraphs.push(element.textContent);
         }
+        const lim = 25;
+        let n = 0;
         paragraphs.forEach(async (p) => {
+            if (n > lim) return;
+            n++;
             let encoded = enc.encode(p);
             let text: string;
             if (encoded.length > 8190) {
