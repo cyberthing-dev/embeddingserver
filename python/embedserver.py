@@ -7,7 +7,10 @@ from py_dotenv import read_dotenv
 import json
 from hashlib import sha1, sha3_224
 
-read_dotenv(".env")
+try:
+    read_dotenv(".env")
+except:
+    print("Couldn't find .env file, must be running in docker so ima use env vars")
 
 client = OpenAI(api_key=env["OPENAIKEY"], organization=env["OPENAIORG"])
 UINT64_MAX = 2**64 - 1

@@ -7,6 +7,7 @@ services:
     build:
       context: ./python/
       dockerfile: Dockerfile
+    env_file: ./python/.env
     image: purplelemons/embedding-db
     volumes:
       - data:/app/db/data
@@ -24,6 +25,7 @@ services:
     #depends_on: 
     # - db
     restart: always
+    env_file: .env
 
 volumes:
   data: {}

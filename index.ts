@@ -111,8 +111,8 @@ const googleSearch = async (query: string) => {
 }
 
 class EmbedAPI {
-    //baseURL = "http://localhost:4211";
-    baseURL = "http://db:4211";
+    // Automatically determine if we're running locally or in a container
+    baseURL = `http://${process.env.WSL_DISTRO_NAME === "Debian" ? "localhost" : "db"}:4211`;
 
     // TODO: add as batch
     add = async (text: string, pageID?: string) => {
@@ -198,7 +198,7 @@ app.post("/browse", async (req, res) => {
     const url: string = req.body.url;
     const topic: string = req.body.topic;
     let results: string[] = [];
-    
+
     const out = await fetch(url).then(r => {
         return r.text();
     }).then(async (response) => {
