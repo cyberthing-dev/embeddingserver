@@ -7,11 +7,9 @@ on:
   #  branches: [ "main" ]
 
 jobs:
-
-  build:
-
+  run: 
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v3
     - name: Create ENV
@@ -21,10 +19,5 @@ jobs:
         echo "${{ secrets.ENV }}" > .env
         cat .env > /python/.env
         cat .env
-  run: 
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
     - name: Compose UP
       run: docker compose -f docker-compose.yml up --build
