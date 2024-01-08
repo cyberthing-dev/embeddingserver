@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Checkout latest
+      uses: actions/checkout@v4.1.1
+    - name: Use inside docker
+      uses: docker://bookworm-slim:latest
     - name: Create ENV
       run: |
         ls
