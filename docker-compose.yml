@@ -1,5 +1,7 @@
 version: '3.8'
 
+name: embeddingserver
+
 services:
   db:
     ipc: host
@@ -20,7 +22,7 @@ services:
     container_name: embedding-web
     build: .
     image: purplelemons/embedding-web
-    ports: 
+    ports:
      - 3658:8181
     #depends_on: 
     # - db

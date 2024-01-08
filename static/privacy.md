@@ -37,7 +37,7 @@ The entirety of the data that *Search Guy* retains is as follows:
 - The vector embeddings of paragraphs from search results, Wikipedia pages, and websites.
 - The plaintext of paragraphs from search results, Wikipedia pages, and websites.
 
-This data is kept on a Docker volume and is not currently deleted, but for performance and accuracy purposes, *Cyberthing* plans on scheduling this data for weekly deletion. The data is not backed up, and is not mirrored on any other servers. *Search Guy*'s services are currently hosted via Docker on a *Cyberthing*-controlled server. This server is hosted on a [Linode](https://www.linode.com/products/shared/) shared machine. The server's storage is not encrypted, but it is safeguarded by both *Cyberthing* and Linode's security measures.
+This data is kept on a Docker volume and is deleted weekly not only for accuracy and performance reasons, but for security and privacy. The data is not backed up, and is not mirrored on any other servers. *Search Guy*'s services are currently hosted via Docker on a *Cyberthing*-controlled server. This server is hosted on a [Linode](https://www.linode.com/products/shared/) shared machine. The server's storage is not encrypted, but it is safeguarded by both *Cyberthing* and Linode's security measures.
 
 ## Links to Other Sites
 
