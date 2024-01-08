@@ -21,5 +21,10 @@ jobs:
         echo "${{ secrets.ENV }}" > .env
         cat .env > python/.env
         cat .env
-    - name: Build the Docker image
+  run: 
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Compose UP
       run: docker compose -f docker-compose.yml up --build
