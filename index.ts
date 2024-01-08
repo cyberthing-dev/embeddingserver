@@ -257,7 +257,7 @@ renderer.heading = (text, level) => {
 };
 
 app.get("/privacy", async (_, res) => {
-    const md = await marked(await (await fetch("/privacy.md")).text(), { renderer });
+    const md = await marked(await (await fetch("privacy.md")).text(), { renderer });
     const head = `<head><title>Privacy Policy</title><link rel="stylesheet" href="/style.css"></head>`;
     res.send(`<!DOCTYPE html><html>${head}<body><main>${md}</main><center>© 2023-2024 CyberThing all rights reserved</center></body></html>`);
 });
