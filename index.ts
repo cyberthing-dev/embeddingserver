@@ -114,6 +114,7 @@ class EmbedAPI {
     //baseURL = "http://localhost:4211";
     baseURL = "http://db:4211";
 
+    // TODO: add as batch
     add = async (text: string, pageID?: string) => {
         const response: {
             success: false;

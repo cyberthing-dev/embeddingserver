@@ -102,12 +102,12 @@ class Handler(BaseHTTPRequestHandler):
         ][:3]
 
     def send(self, code: int, data: dict):
-        to_send = json.dumps(data).encode("utf-8")
+        to_send = json.dumps(data)
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", len(to_send))
         self.end_headers()
-        self.wfile.write(to_send)
+        self.wfile.write(to_send.encode("utf-8"))
 
     def json(self) -> dict:
         # content_len = self.headers.get("Content-Length", 0)
