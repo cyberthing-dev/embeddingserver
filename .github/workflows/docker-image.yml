@@ -19,7 +19,7 @@ jobs:
         touch .env
         touch python/.env
         echo "${{ secrets.ENV }}" > .env
-        cat .env > python/.env
+        cat .env > /python/.env
         cat .env
   run: 
     runs-on: ubuntu-latest
