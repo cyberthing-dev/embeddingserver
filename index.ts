@@ -113,10 +113,10 @@ const googleSearch = async (query: string) => {
 
 class EmbedAPI {
     // Automatically determine if we're running locally or in a container
-    baseURL = `http://${process.env.WSL_DISTRO_NAME === "Debian" ? "localhost" : "db"}:4211`;
+    baseURL = `http://${process.env.WSL_DISTRO_NAME != null ? "localhost" : "db"}:4211`;
 
     // TODO: add as batch
-    add = async (text: string, pageID?: string) => {
+    add = async (texts: string[]) => {
         const response: {
             success: false;
             error: string;
@@ -131,27 +131,18 @@ class EmbedAPI {
                     "Content-Type": "application/json",
                     "Request-Timeout": "50"
                 },
-                body: JSON.stringify({ text, pageID })
+                body: JSON.stringify({ texts })
             }
         )).json();
         return response;
     }
 
     queryV2 = async (text: string) => {
-        const { paragraphs } = await wikiSearch(text);
-        const { snippets, links } = await googleSearch(text);
-        const lim = 25;
-        let n = 0;
-        for (let i = 0; i < paragraphs.length; i++) {
-            if (n > lim) break;
-            n++;
-            await this.add(paragraphs[i]);
-        }
-        for (const snippet of snippets) {
-            if (n > lim) break;
-            n++;
-            await this.add(snippet);
-        }
+        let links = await Promise.all([wikiSearch(text), googleSearch(text)]).then(async ([wiki, google]) => {
+            await this.add([...wiki.paragraphs.slice(0, 12), ...google.snippets.slice(0, 12)]);
+            return google.links;
+        });
+
         return {
             query: await this.query(text),
             links: links
@@ -205,13 +196,16 @@ app.post("/browse", async (req, res) => {
     }).then(async (response) => {
         const document = new JSDOM(response).window.document;
         let paragraphs: string[] = [];
-        for (const element of document.querySelectorAll("p")) {
-            if (element.textContent) paragraphs.push(element.textContent);
-        }
         const lim = 25;
         let n = 0;
-        paragraphs.forEach(async (p) => {
-            if (n > lim) return;
+        for (const element of document.querySelectorAll("p")) {
+            if (paragraphs.length > lim) break;
+            n++;
+            if (element.textContent) paragraphs.push(element.textContent);
+        }
+        let newParagraphs = [];
+        for (const p of paragraphs) {
+            if (n > lim) break;
             n++;
             let encoded = enc.encode(p);
             let text: string;
@@ -220,8 +214,10 @@ app.post("/browse", async (req, res) => {
             } else {
                 text = p;
             }
-            return await embedAPI.add(text);
-        });
+            newParagraphs.push(text);
+        }
+        await embedAPI.add(newParagraphs);
+
         return (await embedAPI.query(topic)).items || [];
     });
     if (out) results.push(...out);
