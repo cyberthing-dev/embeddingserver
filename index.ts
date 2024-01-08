@@ -138,10 +138,16 @@ class EmbedAPI {
     queryV2 = async (text: string) => {
         const { paragraphs } = await wikiSearch(text);
         const { snippets, links } = await googleSearch(text);
+        const lim = 32;
+        let n = 0;
         for (let i = 0; i < paragraphs.length; i++) {
+            if (n > lim) break;
+            n++;
             await this.add(paragraphs[i]);
         }
         for (const snippet of snippets) {
+            if (n > lim) break;
+            n++;
             await this.add(snippet);
         }
         return {
@@ -191,7 +197,7 @@ app.post("/browse", async (req, res) => {
     const url: string = req.body.url;
     const topic: string = req.body.topic;
     let results: string[] = [];
-
+    
     const out = await fetch(url).then(r => {
         return r.text();
     }).then(async (response) => {

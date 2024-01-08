@@ -35,7 +35,7 @@ class Handler(BaseHTTPRequestHandler):
     text_db = text_db
     text_hashes: NDArray[np.uint64]
     page_ids: NDArray[np.uint32]
-    embeds: NDArray  # [NDArray[np.float64]]
+    embeds: NDArray
 
     # def log_message(self, *_, **__) -> None:
     #    return
