@@ -11,7 +11,7 @@ services:
     volumes:
       - data:/app/db/data
     tty: true
-    restart: unless-stopped
+    restart: always
 
   web:
     links:
@@ -23,7 +23,7 @@ services:
      - 3658:8181
     #depends_on: 
     # - db
-    restart: unless-stopped
+    restart: always
 
 volumes:
   data: {}

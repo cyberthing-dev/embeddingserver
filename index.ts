@@ -138,7 +138,7 @@ class EmbedAPI {
     queryV2 = async (text: string) => {
         const { paragraphs } = await wikiSearch(text);
         const { snippets, links } = await googleSearch(text);
-        const lim = 32;
+        const lim = 25;
         let n = 0;
         for (let i = 0; i < paragraphs.length; i++) {
             if (n > lim) break;
