@@ -37,7 +37,7 @@ class Handler(BaseHTTPRequestHandler):
     page_ids: NDArray[np.uint32]
     embeds: NDArray  # [NDArray[np.float64]]
 
-    #def log_message(self, *_, **__) -> None:
+    # def log_message(self, *_, **__) -> None:
     #    return
 
     @staticmethod
@@ -110,8 +110,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(to_send)
 
     def json(self) -> dict:
-        #content_len = self.headers.get("Content-Length", 0)
-        length = int(self.headers.get("Content-Length",0))
+        # content_len = self.headers.get("Content-Length", 0)
+        length = int(self.headers.get("Content-Length", 0))
         out = self.rfile.read(length)
         if length == 0:
             raise ValueError("No data")
@@ -142,7 +142,7 @@ class Handler(BaseHTTPRequestHandler):
 
             elif self.path == "/query":
                 json = self.json()
-                #print(json)
+                # print(json)
                 items = self.query(json["text"])
                 self.send(200, {"success": True, "items": items})
 
@@ -162,7 +162,23 @@ def main():
     Handler.text_hashes = text_hashes
     Handler.protocol_version = "HTTP/1.1"
     Handler.timeout = 50
-    server = ThreadingHTTPServer(("0.0.0.0", 4211), Handler)
+
+    def do_save():
+        # save everything
+        with open("data/text.json", "w") as f:
+            json.dump(Handler.text_db, f)
+        with open("data/embeds.npy", "wb") as f:
+            np.save(f, Handler.embeds)
+        with open("data/texthashes.npy", "wb") as f:
+            np.save(f, Handler.text_hashes)
+
+    class NewServer(ThreadingHTTPServer):
+        def service_actions(self):
+            do_save()
+            return super().service_actions()
+
+    server = NewServer(("0.0.0.0", 4211), Handler)
+
     try:
         print("Hosted on http://localhost:4211")
         server.serve_forever()
@@ -171,13 +187,7 @@ def main():
             server.server_close()
         except:
             pass
-        # save everything
-        with open("data/text.json", "w") as f:
-            json.dump(Handler.text_db, f)
-        with open("data/embeds.npy", "wb") as f:
-            np.save(f, Handler.embeds)
-        with open("data/texthashes.npy", "wb") as f:
-            np.save(f, Handler.text_hashes)
+        do_save()
 
 
 if __name__ == "__main__":
