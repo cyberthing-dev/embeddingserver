@@ -21,9 +21,5 @@ jobs:
         echo ${{ secrets.ENV }} >> .env
         echo ${{ secrets.ENV }} >> python/.env
         cat .env
-    - name: Create other ENV
-      run: |
-        touch 
-        echo $$
     - name: Build the Docker image
       run: docker compose -f docker-compose.yml up --build
