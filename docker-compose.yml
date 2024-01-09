@@ -24,8 +24,6 @@ services:
     image: purplelemons/embedding-web
     ports:
      - 3658:8181
-    #depends_on: 
-    # - db
     restart: always
     env_file: .env
 

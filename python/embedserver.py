@@ -1,12 +1,11 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from time import perf_counter
 import numpy as np
-from numpy.typing import NDArray, ArrayLike
+from numpy.typing import NDArray
 from openai import OpenAI
 from os import environ as env
 from py_dotenv import read_dotenv
 import json
-from hashlib import sha256
 from datetime import datetime as dt
 
 
@@ -18,7 +17,7 @@ except:
 client = OpenAI(api_key=env["OPENAIKEY"], organization=env["OPENAIORG"])
 
 UINT64_MAX = 2**64 - 1
-TIMEOUT = 6
+TIMEOUT = 4
 
 try:
     with open("data/text.json", "r") as f:
@@ -40,7 +39,7 @@ except:
 
 
 class Handler(BaseHTTPRequestHandler):
-    text_db:dict[str,str] = text_db
+    text_db: dict[str, str] = text_db
     text_hashes: NDArray[np.uint64]
     page_ids: NDArray[np.uint32]
     embeds: NDArray
@@ -61,18 +60,19 @@ class Handler(BaseHTTPRequestHandler):
         return 1 - np.dot(a, b)
 
     @staticmethod
-    def hashedEmbed(embed: NDArray[np.float64]) -> str:
-        return sha256(embed.__str__().encode("utf-8")).hexdigest()
+    # @njit(cache=True)
+    def hashedEmbed(embed: NDArray[np.float64]):
+        return hex(abs(hash(str(embed))))
 
     @staticmethod
     def textHash(text: str) -> int:
-        return min(int(sha256(text.encode("utf-8"), usedforsecurity=False).hexdigest()[:16], 16), UINT64_MAX)
+        return abs(hash(text))
+
+    def manyHashes(self, texts: set[str]) -> dict[str, int]:
+        return {text: self.textHash(text) for text in texts}
 
     def lookupEmbed(self, hashedEmbed: str) -> str | None:
-        try:
-            return Handler.text_db[hashedEmbed]
-        except KeyError:
-            return ""
+        return Handler.text_db.get(hashedEmbed, None)
 
     def createEmbedding(self, text: str) -> NDArray[np.float64]:
         return self.unit_l2_normalization(
@@ -93,11 +93,16 @@ class Handler(BaseHTTPRequestHandler):
             lookedup = self.lookupEmbed(self.hashedEmbed(embed))
             if lookedup:
                 temp[distance] = lookedup
-        return [
+        sorteditems = [
             i
             for _, i in sorted(temp.items(), key=lambda x: x[0])
-            if not i.startswith("== ")
-        ][:3]
+        ][:16]
+        temp2:list[str] = []
+        for x in sorteditems:
+            if sum(len(i) for i in temp2) > 1100:
+                break
+            temp2.append(x)
+        return temp2
 
     def send(self, code: int, data: dict):
         to_send = json.dumps(data)
@@ -121,37 +126,29 @@ class Handler(BaseHTTPRequestHandler):
                 items = 0
                 json = self.json()
                 texts: set[str] = set(sorted(json["texts"], key=lambda x: len(x)))
+                #shuffle(json["texts"])
+                #texts: set[str] = set(json["texts"])
 
                 st = perf_counter()
-                for text in texts:
-                    # print("")
+                for text,hashedtxt in self.manyHashes(texts).items():
+                    print(hashedtxt, end="\r")
                     if perf_counter() - st > TIMEOUT:
                         break
-                    # print("finished perf time check")
-
+                    if hashedtxt in Handler.text_hashes:
+                        continue
                     if text.startswith("== See also ==\n") or text.endswith("=="):
                         continue
-                    # print("finished see also check")
-
-                    texthash = self.textHash(text)
-                    # print("finished hash gen")
-                    if texthash in Handler.text_hashes:
-                        continue
-                    # print("finished hash check")
-
                     textEmbed = self.createEmbedding(text)
-                    # print("finished embed gen")
                     hashed = self.hashedEmbed(textEmbed)
-                    # print("finished embed hash gen")
                     if not self.lookupEmbed(hashedEmbed=hashed):
                         Handler.text_db[hashed] = text
                         Handler.embeds = np.append(Handler.embeds, [textEmbed], axis=0)
                         Handler.text_hashes: NDArray[np.uint64] = np.append(
-                            Handler.text_hashes, [texthash]
+                            Handler.text_hashes, [hashedtxt]
                         )
 
                     items += 1
-                print(f"Added {items} items")
+                print(f"eval {items=} in {perf_counter() - st:.2f}s (max {TIMEOUT}s)")
                 self.send(200, {"success": True, "items": items})
 
             elif self.path == "/query":

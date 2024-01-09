@@ -67,21 +67,27 @@ const wikiSearch = async (query: string) => {
         explaintext: "true"
     });
     const baseURL = "https://en.wikipedia.org/w/api.php";
-    const results: {
+    let results: {
         [key: string]: {
             extract: string;
         }
-    } = (await (await fetch(
-        `${baseURL}?${params}`,
-        {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                // Tell them who we are in case they want to contact us
-                "User-Agent": `GPTSearch (${process.env.GHCONTACT})`,
+    }
+    try {
+        results = (await (await fetch(
+            `${baseURL}?${params}`,
+            {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    // Tell them who we are in case they want to contact us
+                    "User-Agent": `GPTSearch (${process.env.GHCONTACT})`,
+                }
             }
-        }
-    )).json()).query.pages;
+        )).json()).query.pages;
+    } catch (e) {
+        console.log(e);
+        return { paragraphs: [] };
+    }
     let paragraphs: string[] = [];
     const pageID = Object.keys(results)[0];
     for (const p of results[pageID].extract.split("\n\n\n")) {
