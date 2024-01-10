@@ -1,6 +1,6 @@
 # Embedding Server
 
-Source code for the SearchGuy GPT app (coming soon to the ChatGPT Store).
+Source code for the SearchGuy GPT app (coming soon to the ChatGPT Store). See new [v2](https://github.com/cyberthing-dev/search-guy)
 
 ## Goals
 
