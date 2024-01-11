@@ -12,7 +12,7 @@ paths:
   /self:
     get:
       operationId: self
-      summary: Query the API about a topic you have already researched. This is by far the fastest search method so try it first
+      summary: Query the API about a topic you have already researched. This is by far the fastest search method so try it first, but you might not find what you queried.
       parameters:
         - name: q
           in: query
