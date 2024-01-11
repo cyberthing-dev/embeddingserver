@@ -194,6 +194,12 @@ app.post("/browse", async (req, res) => {
     }
 
     const url: string = req.body.url;
+    if (url.match(/https:\/\/.*\.wikipedia\.org\/.*/g))
+        return res.json({
+            results: {
+                items: (await wikiSearch(req.body.topic)).paragraphs
+            }
+        });
     const topic: string = req.body.topic;
     let results: string[] = [];
 
