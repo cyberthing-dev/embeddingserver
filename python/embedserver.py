@@ -15,7 +15,7 @@ except:
     print("Couldn't find .env file, must be running in docker so ima use env vars")
 
 client = OpenAI(api_key=env["OPENAIKEY"], organization=env["OPENAIORG"])
-client_tokenizer = tiktoken.encoding_for_model(env["CHATMODEL"])
+client_tokenizer = tiktoken.get_encoding(env["CHATMODEL"])
 
 UINT64_MAX = 2**64 - 1
 TIMEOUT = 4
