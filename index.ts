@@ -266,7 +266,8 @@ app.get("/self", async (req, res) => {
     return {
         result: (
             await embedAPI.query(req.query.q as string)
-        ).items || ["No results found"]
+        ).items || ["No results found"],
+        date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
     };
 });
 
