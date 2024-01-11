@@ -202,25 +202,29 @@ app.post("/browse", async (req, res) => {
     }).then(async (response) => {
         const document = new JSDOM(response).window.document;
         let paragraphs: string[] = [];
-        const lim = 25;
-        let n = 0;
-        for (const element of document.querySelectorAll("p")) {
-            if (paragraphs.length > lim) break;
-            n++;
-            if (element.textContent) paragraphs.push(element.textContent);
+        for (const element of Array.from(
+            document.querySelectorAll("p"))
+            .sort((a, b) => a.textContent!.length - b.textContent!.length)
+        ) {
+            if (element.textContent)
+                paragraphs.push(element.textContent
+                    .replace(/\n/g, " ")
+                    .replace(/\t/g, " ")
+                    .replace("’", "'")
+                    .replace("  ", " ")
+                    .replace("“", "\"")
+                    .replace("”", "\"")
+                    .trim()
+                );
         }
-        let newParagraphs = [];
+        let newParagraphs: string[] = [];
         for (const p of paragraphs) {
-            if (n > lim) break;
-            n++;
             let encoded = enc.encode(p);
-            let text: string;
-            if (encoded.length > 8190) {
-                text = new TextDecoder().decode(enc.decode(encoded.slice(0, 8190)));
-            } else {
-                text = p;
-            }
-            newParagraphs.push(text);
+            newParagraphs.push(
+                new TextDecoder().decode(
+                    enc.decode(encoded.slice(0, 8190))
+                )
+            );
         }
         await embedAPI.add(newParagraphs);
 
@@ -263,12 +267,12 @@ app.get("/self", async (req, res) => {
         res.status(401).send("Unauthorized");
         return;
     }
-    return {
+    res.json({
         result: (
             await embedAPI.query(req.query.q as string)
         ).items || ["No results found"],
         date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
-    };
+    });
 });
 
 // TODO: subclass marked.Renderer to make header tags have ids

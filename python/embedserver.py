@@ -95,6 +95,7 @@ class Handler(BaseHTTPRequestHandler):
             if lookedup:
                 temp[distance] = lookedup
         temp2: list[str] = []
+        print("done with embeds")
         token_count = 0
         for sortedItem in [i for _, i in sorted(temp.items(), key=lambda x: x[0])][:20]:
             if token_count > 860:
@@ -124,11 +125,12 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == "/add":
                 items = 0
                 json = self.json()
-                texts: set[str] = set(sorted(json["texts"], key=lambda x: len(x)))
-
+                #texts: set[str] = set(sorted(json["texts"], key=lambda x: len(x)))
+                texts: set[str] = set(json["texts"])
+                #print("got {}".format("\n".join(i[:20] for i in texts)))
                 st = perf_counter()
                 for text, hashedtxt in self.manyHashes(texts).items():
-                    print(hashedtxt, end="\r")
+                    #print(hashedtxt, end="\r")
                     if perf_counter() - st > TIMEOUT:
                         break
                     if hashedtxt in Handler.text_hashes:

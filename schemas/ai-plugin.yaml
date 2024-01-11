@@ -1,13 +1,40 @@
 openapi: 3.1.0
 info:
   title: Web Search
-  description: Use Web Search to search the web and get page summaries. Try changing your query prompt if you aren't
+  description:
+    Use Web Search to search the web and get page summaries. Try changing your query prompt if you aren't
     getting the desired results.
-  version: 1.1.2
+  version: 1.1.3
 servers:
   - url: https://gptsearch.cyberthing.dev
     description: Search server
 paths:
+  /self:
+    get:
+      operationId: self
+      summary: Query the API about a topic you have already researched. This is by far the fastest search method so try it first
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: The search string
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The current version of the API
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      type: string
+                  date:
+                    type: string
+                    description: The current GMT date and time
   /search:
     get:
       operationId: query
@@ -68,29 +95,3 @@ paths:
                     type: array
                     items:
                       type: string
-  /self:
-    get:
-      operationId: self
-      summary: Query the API about a topic you have already researched.
-      parameters:
-        - name: q
-          in: query
-          required: true
-          description: The search string
-          schema:
-            type: string
-      responses:
-        "200":
-          description: The current version of the API
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  result:
-                    type: array
-                    items:
-                      type: string
-                  date:
-                    type: string
-                    description: The current GMT date and time
