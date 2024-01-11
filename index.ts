@@ -251,6 +251,25 @@ app.get("/search", async (req, res) => {
     });
 });
 
+app.get("/self", async (req, res) => {
+
+    /**
+     *  Remove if you aren't deploying your own instance to OpenAI.
+     *  Otherwise, you should set the environment variable CHATGPTSECRET
+     * to some randomly generated key.
+     */
+    if (req.headers.authorization !== `Bearer ${process.env.CHATGPTSECRET}`) {
+        console.log("Unauthorized request");
+        res.status(401).send("Unauthorized");
+        return;
+    }
+    return {
+        result: (
+            await embedAPI.query(req.query.q as string)
+        ).items || ["No results found"]
+    };
+});
+
 // TODO: subclass marked.Renderer to make header tags have ids
 const renderer = new marked.Renderer();
 renderer.heading = (text, level) => {

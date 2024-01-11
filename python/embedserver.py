@@ -7,7 +7,7 @@ from os import environ as env
 from py_dotenv import read_dotenv
 import json
 from datetime import datetime as dt
-
+import tiktoken
 
 try:
     read_dotenv(".env")
@@ -15,6 +15,7 @@ except:
     print("Couldn't find .env file, must be running in docker so ima use env vars")
 
 client = OpenAI(api_key=env["OPENAIKEY"], organization=env["OPENAIORG"])
+client_tokenizer = tiktoken.encoding_for_model(env["CHATMODEL"])
 
 UINT64_MAX = 2**64 - 1
 TIMEOUT = 4
@@ -93,15 +94,13 @@ class Handler(BaseHTTPRequestHandler):
             lookedup = self.lookupEmbed(self.hashedEmbed(embed))
             if lookedup:
                 temp[distance] = lookedup
-        sorteditems = [
-            i
-            for _, i in sorted(temp.items(), key=lambda x: x[0])
-        ][:16]
-        temp2:list[str] = []
-        for x in sorteditems:
-            if sum(len(i) for i in temp2) > 1100:
+        temp2: list[str] = []
+        token_count = 0
+        for sortedItem in [i for _, i in sorted(temp.items(), key=lambda x: x[0])][:20]:
+            if token_count > 860:
                 break
-            temp2.append(x)
+            temp2.append(sortedItem)
+            token_count += len(client_tokenizer.encode(sortedItem))
         return temp2
 
     def send(self, code: int, data: dict):
@@ -126,11 +125,9 @@ class Handler(BaseHTTPRequestHandler):
                 items = 0
                 json = self.json()
                 texts: set[str] = set(sorted(json["texts"], key=lambda x: len(x)))
-                #shuffle(json["texts"])
-                #texts: set[str] = set(json["texts"])
 
                 st = perf_counter()
-                for text,hashedtxt in self.manyHashes(texts).items():
+                for text, hashedtxt in self.manyHashes(texts).items():
                     print(hashedtxt, end="\r")
                     if perf_counter() - st > TIMEOUT:
                         break
