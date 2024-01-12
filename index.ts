@@ -273,10 +273,15 @@ app.get("/self", async (req, res) => {
         res.status(401).send("Unauthorized");
         return;
     }
+    let result = (
+        await embedAPI.query(req.query.q as string)
+    ).items;
+    if (!result) {
+        result = (await embedAPI.queryV2(req.query.q as string)).query.items;
+    };
+
     res.json({
-        result: (
-            await embedAPI.query(req.query.q as string)
-        ).items || ["No results found"],
+        result,
         date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
     });
 });

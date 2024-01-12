@@ -4,7 +4,7 @@ info:
   description:
     Use Web Search to search the web and get page summaries. Try changing your query prompt if you aren't
     getting the desired results.
-  version: 1.2.1
+  version: 1.2.3
 servers:
   - url: https://gptsearch.cyberthing.dev
     description: Search server
@@ -37,7 +37,7 @@ paths:
                     description: The current GMT date and time
   /search:
     get:
-      operationId: query
+      operationId: search
       summary: Perform a custom Web search and return snippets and their urls
       parameters:
         - name: q
