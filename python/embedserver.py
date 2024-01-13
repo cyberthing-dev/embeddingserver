@@ -112,6 +112,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(to_send)))
         self.end_headers()
         self.wfile.write(to_send.encode("utf-8"))
+        self.wfile.flush()
 
     def json(self) -> dict:
         # content_len = self.headers.get("Content-Length", 0)
@@ -155,7 +156,7 @@ class Handler(BaseHTTPRequestHandler):
                 json = self.json()
                 # print(json)
                 items = self.query(json["text"])
-                print(items)
+                #print(items)
                 self.send(200, {"success": True, "items": items})
 
             else:
