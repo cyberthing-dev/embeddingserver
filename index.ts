@@ -203,41 +203,44 @@ app.post("/browse", async (req, res) => {
     const topic: string = req.body.topic;
     let results: string[] = [];
 
-    const out = await fetch(url).then(r => {
+    await fetch(url).then(r => {
         return r.text();
     }).then(async (response) => {
-        const document = new JSDOM(response).window.document;
-        let paragraphs: string[] = [];
-        for (const element of Array.from(
-            document.querySelectorAll("p"))
-            .sort((a, b) => a.textContent!.length - b.textContent!.length)
-        ) {
-            if (element.textContent)
-                paragraphs.push(element.textContent
-                    .replace(/\n/g, " ")
-                    .replace(/\t/g, " ")
-                    .replace("  ", " ")
-                    .replace("’", "'")
-                    .replace("“", "\"")
-                    .replace("”", "\"")
-                    .trim()
-                );
-        }
-        let newParagraphs: string[] = [];
-        for (const p of paragraphs) {
-            let encoded = enc.encode(p);
-            newParagraphs.push(
-                new TextDecoder().decode(
-                    enc.decode(encoded.slice(0, 8190))
-                )
-            );
-        }
-        await embedAPI.add(newParagraphs);
+        const window = new JSDOM(response).window;
+        window.onload = async () => {
+            const document = window.document;
 
-        return (await embedAPI.query(topic)).items || [];
+            let paragraphs: string[] = [];
+            for (const element of Array.from(
+                document.querySelectorAll("p"))
+                .sort((a, b) => a.textContent!.length - b.textContent!.length)
+            ) {
+                if (element.textContent)
+                    paragraphs.push(element.textContent
+                        .replace(/\n/g, " ")
+                        .replace(/\t/g, " ")
+                        .replace("  ", " ")
+                        .replace("’", "'")
+                        .replace("“", "\"")
+                        .replace("”", "\"")
+                        .trim()
+                    );
+            }
+            let newParagraphs: string[] = [];
+            for (const p of paragraphs) {
+                let encoded = enc.encode(p);
+                newParagraphs.push(
+                    new TextDecoder().decode(
+                        enc.decode(encoded.slice(0, 8190))
+                    )
+                );
+            }
+            await embedAPI.add(newParagraphs);
+
+            res.json((await embedAPI.query(topic)).items || []);
+        };
+
     });
-    if (out) results.push(...out);
-    res.json(results);
 });
 
 
