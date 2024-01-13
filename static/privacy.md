@@ -2,7 +2,7 @@
 
 Effective date: <code style="font-size:11pt; padding: 3px; border-radius: 6px; background-color: #222;">2023/12/14</code>
 
-Last edited: <code style="font-size:11pt; padding: 3px; border-radius: 6px; background-color: #222;">2024/01/07</code>
+Last edited: <code style="font-size:11pt; padding: 3px; border-radius: 6px; background-color: #222;">2024/01/13</code>
 
 At *Cyberthing*, one of our main priorities is the privacy of our users. This Privacy Policy document contains types of information that is collected and recorded by *Search Guy* and how we use it.
 
@@ -37,7 +37,7 @@ The entirety of the data that *Search Guy* retains is as follows:
 - The vector embeddings of paragraphs from search results, Wikipedia pages, and websites.
 - The plaintext of paragraphs from search results, Wikipedia pages, and websites.
 
-This data is kept on a Docker volume and is deleted weekly not only for accuracy and performance reasons, but for security and privacy. The data is not backed up, and is not mirrored on any other servers. *Search Guy*'s services are currently hosted via Docker on a *Cyberthing*-controlled server. This server is hosted on a [Linode](https://www.linode.com/products/shared/) shared machine. The server's storage is not encrypted, but it is safeguarded by both *Cyberthing* and Linode's security measures.
+This data is kept on a Docker volume and is deleted daily not only for accuracy and performance reasons, but for security and privacy. The data is not backed up, and is not mirrored on any other servers. *Search Guy*'s services are currently hosted via Docker on a *Cyberthing*-controlled server. This server is hosted on a [Linode](https://www.linode.com/products/shared/) shared machine. The server's storage is not encrypted, but it is safeguarded by both *Cyberthing* and Linode's security measures.
 
 ## Links to Other Sites
 

@@ -186,16 +186,15 @@ def main():
 
     class NewServer(ThreadingHTTPServer):
         def service_actions(self):
-            # weekly delete--nested for performance
-            if dt.today().isoweekday() == 0:
-                if dt.today().hour == 0:
-                    if dt.today().minute == 0:
-                        if dt.today().second == 0 and dt.today().microsecond in range(
-                            100000
-                        ):
-                            Handler.text_db = {}
-                            Handler.embeds = np.zeros((1, 1536), dtype=np.float64)
-                            Handler.text_hashes = np.array([], dtype=np.uint64)
+            # daily delete--nested for performance
+            if dt.today().hour == 0:
+                if dt.today().minute == 0:
+                    if dt.today().second == 0 and dt.today().microsecond in range(
+                        100000
+                    ):
+                        Handler.text_db = {}
+                        Handler.embeds = np.zeros((1, 1536), dtype=np.float64)
+                        Handler.text_hashes = np.array([], dtype=np.uint64)
             do_save()
             return super().service_actions()
 
