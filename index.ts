@@ -262,6 +262,7 @@ app.get("/search", async (req, res) => {
         ).items,
         links: []
     };
+    console.log(JSON.stringify(result));
     if (!result.items) {
         let temp = await embedAPI.queryV2(req.query.q as string);
         result = {
