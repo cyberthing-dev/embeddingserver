@@ -201,7 +201,6 @@ app.post("/browse", async (req, res) => {
             }
         });
     const topic: string = req.body.topic;
-    let results: string[] = [];
 
     await fetch(url).then(r => {
         return r.text();
@@ -237,7 +236,8 @@ app.post("/browse", async (req, res) => {
             }
             await embedAPI.add(newParagraphs);
 
-            res.json((await embedAPI.query(topic)).items || []);
+            const out = (await embedAPI.query(topic)).items || [];
+            res.json(out);
         };
 
     });
@@ -273,11 +273,12 @@ app.get("/search", async (req, res) => {
         };
     };
 
-    res.json({
+    const out = {
         links: result.links,
         results: result.items,
         date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
-    });
+    };
+    res.json(out);
 });
 
 // TODO: subclass marked.Renderer to make header tags have ids
