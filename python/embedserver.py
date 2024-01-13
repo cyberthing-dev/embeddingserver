@@ -155,6 +155,7 @@ class Handler(BaseHTTPRequestHandler):
                 json = self.json()
                 # print(json)
                 items = self.query(json["text"])
+                print(f"{items}")
                 self.send(200, {"success": True, "items": items})
 
             else:
