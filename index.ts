@@ -216,8 +216,8 @@ app.post("/browse", async (req, res) => {
                 paragraphs.push(element.textContent
                     .replace(/\n/g, " ")
                     .replace(/\t/g, " ")
-                    .replace("’", "'")
                     .replace("  ", " ")
+                    .replace("’", "'")
                     .replace("“", "\"")
                     .replace("”", "\"")
                     .trim()
@@ -253,35 +253,26 @@ app.get("/search", async (req, res) => {
         res.status(401).send("Unauthorized");
         return;
     }
-    const embedQuery = await embedAPI.queryV2(req.query.q as string);
-    res.json({
-        results: embedQuery.query.items || ["No results found"],
-        links: embedQuery.links,
-        date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
-    });
-});
-
-app.get("/self", async (req, res) => {
-
-    /**
-     *  Remove if you aren't deploying your own instance to OpenAI.
-     *  Otherwise, you should set the environment variable CHATGPTSECRET
-     * to some randomly generated key.
-     */
-    if (req.headers.authorization !== `Bearer ${process.env.CHATGPTSECRET}`) {
-        console.log("Unauthorized request");
-        res.status(401).send("Unauthorized");
-        return;
-    }
-    let result = (
-        await embedAPI.query(req.query.q as string)
-    ).items;
-    if (!result) {
-        result = (await embedAPI.queryV2(req.query.q as string)).query.items;
+    let result: {
+        items: string[] | undefined;
+        links?: string[];
+    } = {
+        items: (
+            await embedAPI.query(req.query.q as string)
+        ).items,
+        links: []
+    };
+    if (!result.items) {
+        let temp = await embedAPI.queryV2(req.query.q as string);
+        result = {
+            links: temp.links,
+            items: temp.query.items
+        };
     };
 
     res.json({
-        result,
+        links: result.links,
+        results: result.items,
         date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
     });
 });
