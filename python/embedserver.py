@@ -140,6 +140,7 @@ class Handler(BaseHTTPRequestHandler):
                     if text.startswith("== See also ==\n") or text.endswith("=="):
                         continue
                     textEmbed = self.createEmbedding(text)
+                    print(len(text), textEmbed.shape)
                     hashed = self.hashedEmbed(textEmbed)
                     if not self.lookupEmbed(hashedEmbed=hashed):
                         Handler.text_db[hashed] = text
@@ -151,6 +152,7 @@ class Handler(BaseHTTPRequestHandler):
                     items += 1
                 print(f"eval {items=} in {perf_counter() - st:.2f}s (max {TIMEOUT}s)")
                 self.send(200, {"success": True, "items": items})
+                return
 
             elif self.path == "/query":
                 json = self.json()
@@ -158,6 +160,7 @@ class Handler(BaseHTTPRequestHandler):
                 items = self.query(json["text"])
                 #print(items)
                 self.send(200, {"success": True, "items": items})
+                return
 
             else:
                 self.send(404, {"success": False, "error": "not found"})
