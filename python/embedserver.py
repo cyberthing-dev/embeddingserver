@@ -45,9 +45,6 @@ class Handler(BaseHTTPRequestHandler):
     page_ids: NDArray[np.uint32]
     embeds: NDArray
 
-    # def log_message(self, *_, **__) -> None:
-    #    return
-
     @staticmethod
     def unit_l2_normalization(vector: NDArray[np.float64]):
         """Normalize a vector using L2 normalization."""
@@ -61,7 +58,6 @@ class Handler(BaseHTTPRequestHandler):
         return 1 - np.dot(a, b)
 
     @staticmethod
-    # @njit(cache=True)
     def hashedEmbed(embed: NDArray[np.float64]):
         return hex(abs(hash(str(embed))))
 
@@ -115,7 +111,6 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.flush()
 
     def json(self) -> dict:
-        # content_len = self.headers.get("Content-Length", 0)
         length = int(self.headers.get("Content-Length", 0))
         out = self.rfile.read(length)
         if length == 0:
@@ -127,12 +122,9 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == "/add":
                 items = 0
                 json = self.json()
-                # texts: set[str] = set(sorted(json["texts"], key=lambda x: len(x)))
                 texts: set[str] = set(json["texts"])
-                # print("got {}".format("\n".join(i[:20] for i in texts)))
                 st = perf_counter()
                 for text, hashedtxt in self.manyHashes(texts).items():
-                    # print(hashedtxt, end="\r")
                     if perf_counter() - st > TIMEOUT:
                         break
                     if hashedtxt in Handler.text_hashes:
@@ -140,6 +132,7 @@ class Handler(BaseHTTPRequestHandler):
                     if text.startswith("== See also ==\n") or text.endswith("=="):
                         continue
                     textEmbed = self.createEmbedding(text)
+                    # removing this will break the server idfk why
                     print(len(text), textEmbed.shape)
                     hashed = self.hashedEmbed(textEmbed)
                     if not self.lookupEmbed(hashedEmbed=hashed):
@@ -156,9 +149,7 @@ class Handler(BaseHTTPRequestHandler):
 
             elif self.path == "/query":
                 json = self.json()
-                # print(json)
                 items = self.query(json["text"])
-                #print(items)
                 self.send(200, {"success": True, "items": items})
                 return
 
