@@ -237,6 +237,7 @@ app.post("/browse", async (req, res) => {
             await embedAPI.add(newParagraphs);
 
             const out = (await embedAPI.query(topic)).items || [];
+            console.log(JSON.stringify(out));
             res.json(out);
         };
 
@@ -278,6 +279,7 @@ app.get("/search", async (req, res) => {
         results: result.items,
         date: new Date().toUTCString().replace(",", "").replace(" GMT", "")
     };
+    console.log(JSON.stringify(out));
     res.json(out);
 });
 
