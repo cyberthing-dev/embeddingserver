@@ -188,7 +188,7 @@ app.post("/browse", async (req, res) => {
      * to some randomly generated key.
      */
     if (req.headers.authorization !== `Bearer ${process.env.CHATGPTSECRET}`) {
-        console.log("Unauthorized request");
+        console.log(`Unauthorized request from ${req.ip}, ${req.headers.authorization}`);
         res.status(401).send("Unauthorized");
         return;
     }
@@ -253,7 +253,7 @@ app.get("/search", async (req, res) => {
      * to some randomly generated key.
      */
     if (req.headers.authorization !== `Bearer ${process.env.CHATGPTSECRET}`) {
-        console.log("Unauthorized request");
+        console.log(`Unauthorized request from ${req.ip}, ${req.headers.authorization}`);
         res.status(401).send("Unauthorized");
         return;
     }
