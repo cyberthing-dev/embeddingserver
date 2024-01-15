@@ -86,7 +86,7 @@ const wikiSearch = async (query: string) => {
         )).json()).query.pages;
     } catch (e) {
         console.log(e);
-        return { error: e };
+        return { paragraphs: [`Error: ${JSON.stringify(e)}`] };
     }
     let paragraphs: string[] = [];
     const pageID = Object.keys(results)[0];
