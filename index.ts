@@ -299,8 +299,8 @@ app.get("/privacy", async (_, res) => {
 
 app.listen(PORT, () => {
     try {
+        console.log(new Date().toLocaleString());
         console.log(`Now listening on http://localhost:${PORT}`);
-
     } catch (e) {
         console.log(e);
     }
