@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Web Search
   description:
-    Use Web Search to search the web and get page summaries. Try changing your query prompt if you aren't getting the desired results.
+    Use Web Search to search the web and get page summaries. Try changing your query prompt if you are getting an error or not the desired results.
   version: 1.3.0
 servers:
   - url: https://gptsearch.cyberthing.dev
@@ -44,7 +44,7 @@ paths:
     post:
       x-openai-isConsequential: false
       operationId: browse
-      summary: Get relevant paragraphs to your site query. Both url and topic are required.
+      summary: Get relevant paragraphs to your site query. Both url and topic are required
       requestBody:
         required: true
         content:
