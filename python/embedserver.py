@@ -19,6 +19,7 @@ client_tokenizer = tiktoken.encoding_for_model(env["CHATMODEL"])
 
 UINT64_MAX = 2**64 - 1
 TIMEOUT = 5
+N_DIMENSIONS = 3072
 
 try:
     with open("data/text.json", "r") as f:
@@ -36,7 +37,7 @@ try:
     with open("data/embeds.npy", "rb") as f:
         embeds: NDArray[np.float64] = np.load(f)
 except:
-    embeds = np.zeros((1, 1536), dtype=np.float64)
+    embeds = np.zeros((1, N_DIMENSIONS), dtype=np.float64)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -74,7 +75,9 @@ class Handler(BaseHTTPRequestHandler):
     def createEmbedding(self, text: str) -> NDArray[np.float64]:
         return self.unit_l2_normalization(
             np.array(
-                client.embeddings.create(input=text, model=env["EMBEDMODEL"])
+                client.embeddings.create(
+                    input=text, model=env["EMBEDMODEL"], dimensions=N_DIMENSIONS
+                )
                 .data[0]
                 .embedding,
                 dtype=np.float64,
@@ -188,7 +191,7 @@ def main():
                         100000
                     ):
                         Handler.text_db = {}
-                        Handler.embeds = np.zeros((1, 1536), dtype=np.float64)
+                        Handler.embeds = np.zeros((1, N_DIMENSIONS), dtype=np.float64)
                         Handler.text_hashes = np.array([], dtype=np.uint64)
             do_save()
             return super().service_actions()
