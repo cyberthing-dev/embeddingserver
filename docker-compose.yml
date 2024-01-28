@@ -12,7 +12,7 @@ services:
     env_file: ./python/.env
     image: purplelemons/embedding-db
     volumes:
-      - /python/data:/app/db/data
+      - /etc/embeddingserver/data:/app/db/data
     tty: true
     restart: always
     
