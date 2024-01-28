@@ -12,9 +12,10 @@ services:
     env_file: ./python/.env
     image: purplelemons/embedding-db
     volumes:
-      - /python/data:containerPath:ro
+      - /python/data:/app/db/data
     tty: true
     restart: always
+    
 
   web:
     links:
