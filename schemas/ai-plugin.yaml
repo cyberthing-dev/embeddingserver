@@ -1,8 +1,7 @@
 openapi: 3.1.0
 info:
   title: Web Search
-  description:
-    Use Web Search to search the web and get page summaries. Try changing your query prompt if you are getting an error or not the desired results.
+  description: Use Web Search to search the web and get page summaries. Try changing your query prompt if you are getting an error or not the desired results.
   version: 1.3.1
 servers:
   - url: https://gptsearch.cyberthing.dev
@@ -11,7 +10,7 @@ paths:
   /search:
     get:
       operationId: search
-      summary: Perform a custom Web search and return snippets and their urls
+      summary: Your query should be a question in natural language as if you're talking to a person
       parameters:
         - name: q
           in: query
@@ -28,8 +27,8 @@ paths:
                 type: object
                 properties:
                   links:
-                    type: array
                     description: Relevant links
+                    type: array
                     items:
                       type: string
                   date:

@@ -275,7 +275,7 @@ app.get("/search", async (req, res) => {
 
         return fetch(link)
             .then(r => r.text())
-            .then(text => {
+            .then(async text => {
                 const window = new JSDOM(text).window;
                 const document = window.document;
                 let paragraphs: string[] = [];
@@ -300,7 +300,7 @@ app.get("/search", async (req, res) => {
                         )
                     );
                 }
-                embedAPI.add(newParagraphs);
+                await embedAPI.add(newParagraphs);
             });
     });
     if (mapped) {
