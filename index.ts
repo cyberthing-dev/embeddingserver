@@ -8,6 +8,7 @@ import { config } from "dotenv";
 import { readFileSync } from "fs";
 
 const PORT = 8181;
+let searched_links: string[] = [];
 const custom_search = customsearch({
     version: "v1",
     auth: process.env.GOOGLEKEY,
@@ -202,7 +203,15 @@ app.post("/browse", async (req, res) => {
         });
     const topic: string = req.body.topic;
 
+    if (searched_links.includes(url)) {
+        const out = (await embedAPI.query(topic)).items || [];
+        console.log(JSON.stringify(out));
+        res.json(out);
+        return;
+    }
+
     await fetch(url).then(r => {
+        searched_links.push(url);
         return r.text();
     }).then(async (response) => {
         const window = new JSDOM(response).window;
@@ -273,8 +282,15 @@ app.get("/search", async (req, res) => {
     };
     const mapped = result.links?.map(async (link) => {
 
+        if (searched_links.includes(link)) {
+            return;
+        }
+
         return fetch(link)
-            .then(r => r.text())
+            .then(r => {
+                searched_links.push(link);
+                return r.text();
+            })
             .then(async text => {
                 const window = new JSDOM(text).window;
                 const document = window.document;
