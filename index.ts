@@ -74,7 +74,7 @@ const wikiSearch = async (query: string) => {
         }
     }
     try {
-        results = (await (await fetch(
+        let temp = (await (await fetch(
             `${baseURL}?${params}`,
             {
                 method: "GET",
@@ -84,7 +84,9 @@ const wikiSearch = async (query: string) => {
                     "User-Agent": `GPTSearch (${process.env.GHCONTACT})`,
                 }
             }
-        )).json()).query.pages;
+        )).json());
+        console.log(JSON.stringify(temp));
+        results = temp.query.pages;
     } catch (e) {
         console.log(e);
         return { paragraphs: [`Error: ${JSON.stringify(e)}`] };
@@ -214,7 +216,7 @@ app.post("/browse", async (req, res) => {
         searched_links.push(url);
         return r.text();
     }).then(async (response) => {
-        const window = new JSDOM(response).window;
+        const window = new JSDOM(response, { runScripts: "outside-only" }).window;
         window.onload = async () => {
             const document = window.document;
 
@@ -292,7 +294,7 @@ app.get("/search", async (req, res) => {
                 return r.text();
             })
             .then(async text => {
-                const window = new JSDOM(text).window;
+                const window = new JSDOM(text, { runScripts: "outside-only" }).window;
                 const document = window.document;
                 let paragraphs: string[] = [];
                 for (const element of Array.from(document.querySelectorAll("p")).sort((a, b) => a.textContent!.length - b.textContent!.length)) {
