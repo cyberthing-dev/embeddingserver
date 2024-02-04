@@ -305,7 +305,7 @@ app.get("/search", async (req, res) => {
     });
     if (mapped) {
         await Promise.all(mapped);
-        result.items = (await embedAPI.queryV2(req.query.q as string)).query.items;
+        result.items = (await embedAPI.query(req.query.q as string)).items;
     }
 
     const out = {
