@@ -90,7 +90,7 @@ class Handler(BaseHTTPRequestHandler):
         for embed in Handler.embeds:
             embed: NDArray[np.float64]
             distance = self.distance(queryEmbed, embed)
-            if distance > 0.6:
+            if distance > 0.55:
                 continue
             lookedup = self.lookupEmbed(self.hashedEmbed(embed))
             if lookedup:

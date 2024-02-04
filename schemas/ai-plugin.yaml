@@ -69,3 +69,5 @@ paths:
                     type: array
                     items:
                       type: string
+        "502":
+          description: The host server had an issue sending output to Cloudflare

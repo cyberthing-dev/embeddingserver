@@ -258,21 +258,55 @@ app.get("/search", async (req, res) => {
         return;
     }
     let result: {
-        items: string[] | undefined;
+        items?: string[] | undefined;
         links?: string[];
     } = {
-        items: (
-            await embedAPI.query(req.query.q as string)
-        ).items,
+        //items: (
+        //    await embedAPI.query(req.query.q as string)
+        //).items,
         links: []
     };
-    if (result.items?.length === 0 || result.items === undefined) {
-        let temp = await embedAPI.queryV2(req.query.q as string);
-        result = {
-            links: temp.links,
-            items: temp.query.items
-        };
+    let temp = await embedAPI.queryV2(req.query.q as string);
+    result = {
+        links: temp.links,
+        //items: temp.query.items
     };
+    const mapped = result.links?.map(async (link) => {
+
+        return fetch(link)
+            .then(r => r.text())
+            .then(text => {
+                const window = new JSDOM(text).window;
+                const document = window.document;
+                let paragraphs: string[] = [];
+                for (const element of Array.from(document.querySelectorAll("p")).sort((a, b) => a.textContent!.length - b.textContent!.length)) {
+                    if (element.textContent)
+                        paragraphs.push(element.textContent
+                            .replace(/\n/g, " ")
+                            .replace(/\t/g, " ")
+                            .replace("  ", " ")
+                            .replace("’", "'")
+                            .replace("“", "\"")
+                            .replace("”", "\"")
+                            .trim()
+                        );
+                }
+                let newParagraphs: string[] = [];
+                for (const p of paragraphs) {
+                    let encoded = enc.encode(p);
+                    newParagraphs.push(
+                        new TextDecoder().decode(
+                            enc.decode(encoded.slice(0, 8190))
+                        )
+                    );
+                }
+                embedAPI.add(newParagraphs);
+            });
+    });
+    if (mapped) {
+        await Promise.all(mapped);
+        result.items = (await embedAPI.queryV2(req.query.q as string)).query.items;
+    }
 
     const out = {
         links: result.links,
