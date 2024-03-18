@@ -10,7 +10,7 @@ services:
       context: ./python/
       dockerfile: Dockerfile
     env_file: ./python/.env
-    image: purplelemons/embedding-db
+    image: ${DOCKER_REGISTRY}/embedding-db
     volumes:
       - /etc/embeddingserver/data:/app/db/data
     tty: true
@@ -22,8 +22,8 @@ services:
      - "db"
     container_name: embedding-web
     build: .
-    image: purplelemons/embedding-web
+    image: ${DOCKER_REGISTRY}/embedding-web
     ports:
-     - 3658:8181
+     - 3658:3658
     restart: always
     env_file: .env 
