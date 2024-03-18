@@ -185,9 +185,10 @@ def main():
     class NewServer(ThreadingHTTPServer):
         def service_actions(self):
             # daily delete--nested for performance
-            if dt.today().hour == 0:
-                if dt.today().minute == 0:
-                    if dt.today().second == 0 and dt.today().microsecond in range(
+            now = dt.today()
+            if now.hour == 0:
+                if now.minute == 0:
+                    if now.second == 0 and now.microsecond in range(
                         100000
                     ):
                         Handler.text_db = {}
@@ -196,10 +197,10 @@ def main():
             do_save()
             return super().service_actions()
 
-    server = NewServer(("0.0.0.0", 4211), Handler)
+    server = NewServer(("0.0.0.0", 3658), Handler)
 
     try:
-        print("Hosted on http://localhost:4211")
+        print("Hosted on http://localhost:3658")
         server.serve_forever()
     except:
         try:
